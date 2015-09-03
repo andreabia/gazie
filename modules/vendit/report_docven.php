@@ -74,6 +74,17 @@ if (isset($_GET['cliente'])) {
    }
 }
 
+if (isset($_GET['articolo'])) {
+   if ($_GET['articolo'] <> '') {
+      $articolo = $_GET['articolo'];
+      $where = " tipdoc LIKE 'F%' AND ".$gTables['tesdoc'].".seziva = '$seziva' and ".$gTables['clfoco'].".descri like '%".addslashes($cliente)."%' and (".$gTables['rigdoc'].".descri like '%".$articolo."%' or ".$gTables['rigdoc'].".codart like '%".$articolo."%') GROUP BY protoc, datfat";
+      $passo = 50;
+      unset($protocollo);
+      unset($numerof);
+	  unset($cliente);
+   }
+}
+
 if (isset($_GET['all'])) {
    gaz_set_time_limit (0);
    $where = "tipdoc LIKE 'F%' AND ".$gTables['tesdoc'].".seziva = '$seziva' GROUP BY protoc, datfat";
@@ -242,21 +253,31 @@ if (!isset($_GET['field']) || ($_GET['field'] == 2) || (empty($_GET['field']))){
 list($usec, $sec) = explode(' ',microtime());
 $querytime = ((float)$usec + (float)$sec);
 $querytime_before = $querytime;
+if (isset($articolo) ) {
+if ( $articolo!="" ) {
+$recordnav = new recordnav($gTables['tesdoc'].' LEFT JOIN '.$gTables['clfoco'].' on '.$gTables['tesdoc'].'.clfoco = '.$gTables['clfoco'].'.codice inner join '.$gTables['rigdoc'].' on '.$gTables['rigdoc'].'.id_tes = '.$gTables['tesdoc'].'.id_tes', $where, $limit, $passo);	
+} 
+} else {
 $recordnav = new recordnav($gTables['tesdoc'].' LEFT JOIN '.$gTables['clfoco'].' on '.$gTables['tesdoc'].'.clfoco = '.$gTables['clfoco'].'.codice', $where, $limit, $passo);
+}
+
 $recordnav -> output();
 ?>
 <table class="Tlarge">
  <tr>
    <td class="FacetFieldCaptionTD">
-		<input type="text" placeholder="Cerca Prot." class="input-xs form-control" name="protoc" value="<?php if (isset($protocollo)) echo $protocollo; ?>" maxlength="6" size="3" tabindex="1" class="FacetInput">
+		<input type="text" placeholder="Cerca Prot." class="input-xs form-control" name="protoc" value="<?php if (isset($protocollo)) echo $protocollo; ?>" tabindex="1" size="5" class="FacetInput">
    </td>
    <!--<td></td>-->
    <td class="FacetFieldCaptionTD">
-		<input type="text" placeholder="Cerca Num." class="input-xs form-control" name="numerof" value="<?php if (isset($numerof)) { print $numerof;} ?>" maxlength="6" size="3" tabindex="2" class="FacetInput">
+		<input type="text" placeholder="Cerca Num." class="input-xs form-control" name="numerof" value="<?php if (isset($numerof)) { print $numerof;} ?>" tabindex="2" size="5">
    </td>
    <td class="FacetFieldCaptionTD"></td>
    <td colspan="1" class="FacetFieldCaptionTD">
-		<input type="text" placeholder="Cerca Cliente" class="input-xs form-control" name="cliente" value="<?php if (isset($cliente)) { print $cliente;} ?>" maxlength="40" size="30" tabindex="3" class="FacetInput">
+		<input type="text" placeholder="Cerca Cliente" class="input-xs form-control" name="cliente" value="<?php if (isset($cliente)) { print $cliente;} ?>" tabindex="3" class="FacetInput">
+   </td>
+   <td colspan="1" class="FacetFieldCaptionTD">
+		<input type="text" placeholder="Cerca Articolo" class="input-xs form-control" name="articolo" value="<?php if (isset($articolo)) { print $articolo;} ?>" tabindex="3" class="FacetInput">
    </td>
    <td class="FacetFieldCaptionTD" colspan="6">
      <input type="submit" class="btn btn-xs btn-default" name="search" value="Cerca" tabindex="1" onClick="javascript:document.report.all.value=1;">
@@ -287,7 +308,7 @@ $linkHeaders -> output();
 $rs_ultimo_documento = gaz_dbi_dyn_query("id_tes", $gTables['tesdoc'], "tipdoc LIKE 'F%' AND seziva = '$seziva'","datfat DESC, protoc DESC, id_tes",0,1);
 $ultimo_documento = gaz_dbi_fetch_array($rs_ultimo_documento);
 //recupero le testate in base alle scelte impostate
-$result = gaz_dbi_dyn_query($gTables['tesdoc'].".*, MAX(".$gTables['tesdoc'].".id_tes) AS reftes,".$gTables['anagra'].".fe_cod_univoco,".$gTables['anagra'].".ragso1,".$gTables['anagra'].".e_mail,".$gTables['clfoco'].".codice,".$gTables['pagame'].".tippag", $gTables['tesdoc']." LEFT JOIN ".$gTables['clfoco']." ON ".$gTables['tesdoc'].".clfoco = ".$gTables['clfoco'].".codice LEFT JOIN ".$gTables['anagra']." ON ".$gTables['clfoco'].".id_anagra = ".$gTables['anagra'].".id  LEFT JOIN ".$gTables['pagame']." ON ".$gTables['tesdoc'].".pagame = ".$gTables['pagame'].".codice", $where, $orderby,$limit, $passo);
+$result = gaz_dbi_dyn_query($gTables['rigdoc'].".*, ".$gTables['tesdoc'].".*, MAX(".$gTables['tesdoc'].".id_tes) AS reftes,".$gTables['anagra'].".fe_cod_univoco,".$gTables['anagra'].".ragso1,".$gTables['anagra'].".e_mail,".$gTables['clfoco'].".codice,".$gTables['pagame'].".tippag", $gTables['tesdoc']." LEFT JOIN ".$gTables['clfoco']." ON ".$gTables['tesdoc'].".clfoco = ".$gTables['clfoco'].".codice  LEFT JOIN ".$gTables['anagra']." ON ".$gTables['clfoco'].".id_anagra = ".$gTables['anagra'].".id  LEFT JOIN ".$gTables['pagame']." ON ".$gTables['tesdoc'].".pagame = ".$gTables['pagame'].".codice inner join ".$gTables['rigdoc']." on ".$gTables['rigdoc'].".id_tes = ".$gTables['tesdoc'].".id_tes", $where, $orderby,$limit, $passo);
 $ctrl_doc = "";
 $ctrl_eff = 999999;
 while ($r = gaz_dbi_fetch_array($result)) {
@@ -447,6 +468,15 @@ while ($r = gaz_dbi_fetch_array($result)) {
         $querytime=print_querytime($querytime);
         echo "</td>";*/
         echo "</tr>\n";
+		if ( isset($articolo) ) 
+			if ( $articolo!="" ) {
+		echo "<tr>";
+		echo "<td>&nbsp;</td>";
+		echo "<td colspan='3' class='FacetDataTD'>".$r['codart']." ";
+		echo $r['descri']." ";
+		echo $r['unimis']." ".$r['quanti']."</td>";
+		echo "</tr>";
+		}
     }
     $ctrl_doc = sprintf('%09d',$r['protoc']).$r['datfat'];
 }
