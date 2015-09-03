@@ -4,7 +4,7 @@
                             GAzie - Gestione Azienda
     Copyright (C) 2004-2015 - Antonio De Vincentiis Montesilvano (PE)
          (http://www.devincentiis.it)
-           <http://gazie.devincentiis.it>
+           <http://gazie.sourceforge.net>
  --------------------------------------------------------------------------
     Questo programma e` free software;   e` lecito redistribuirlo  e/o
     modificarlo secondo i  termini della Licenza Pubblica Generica GNU
@@ -669,11 +669,11 @@ echo "<td class=\"FacetFieldCaptionTD\">".$script_transl['fatimm']."</td><td col
 $gForm->variousSelect('fatimm',$script_transl['fatimm_value'],$form['fatimm']);
 echo "\t </td>\n";
 echo "</tr>\n";
-echo "<tr>\n";
+/*echo "<tr>\n";
 echo "<td class=\"FacetFieldCaptionTD\">".$script_transl['artsea']."</td><td colspan=\"2\" class=\"FacetDataTD\">\n";
 $gForm->variousSelect('artsea',$script_transl['artsea_value'],$form['artsea']);
 echo "\t </td>\n";
-echo "</tr>\n";
+echo "</tr>\n";*/
 echo "<tr><td class=\"FacetFieldCaptionTD\">".$script_transl['templ_set']."</td>\n";
 echo '<td class="FacetDataTD" colspan="2">';
 echo '<select name="template" class="FacetSelect">';

@@ -4,7 +4,7 @@
                             GAzie - Gestione Azienda
     Copyright (C) 2004-2015 - Antonio De Vincentiis Montesilvano (PE)
          (http://www.devincentiis.it)
-           <http://gazie.devincentiis.it>
+           <http://gazie.sourceforge.net>
  --------------------------------------------------------------------------
     Questo programma e` free software;   e` lecito redistribuirlo  e/o
     modificarlo secondo i  termini della Licenza Pubblica Generica GNU
@@ -54,26 +54,27 @@ if (isset($_GET['all'])) {
    $passo = 100000;
 } else {
    if (isset($_GET['auxil'])) {
-      $where = $search_field_Array[$admin_aziend['artsea']][0]." LIKE '".addslashes($_GET['auxil'])."%'";
+		$where = $search_field_Array[$admin_aziend['artsea']][0]." LIKE '%".addslashes($_GET['auxil'])."%'";
+		$where .= " or codice like '%".addslashes($_GET['auxil'])."%'";
+		$where .= " or barcode = '".$_GET['auxil']."'";
    }
 }
 
 if (!isset($_GET['auxil'])) {
    $auxil = "";
-   $where = $search_field_Array[$admin_aziend['artsea']][0]." LIKE '$auxil%'";
+   $where = $search_field_Array[$admin_aziend['artsea']][0]." LIKE '%$auxil%'";
 }
 ?>
 <div align="center" class="FacetFormHeaderFont">Articoli</div>
 <form method="GET">
 <table class="Tlarge">
 <tr>
-<td class="FacetFieldCaptionTD" colspan="2"><?php echo $search_field_Array[$admin_aziend['artsea']][1]; ?>:
-<input type="text" name="auxil" value="<?php if ($auxil != "&all=yes") echo $auxil; ?>" maxlength="15" size="15" tabindex="1" class="FacetInput">
-<input type="submit" name="search" value="Cerca" tabindex="1" onClick="javascript:document.report.all.value=1;">
+<td class="FacetFieldCaptionTD" colspan="2">
+	<input class="input-xs form-control" placeholder="codice,descrizione,barcode" type="text" name="auxil" value="<?php if ($auxil != "&all=yes") echo $auxil; ?>" tabindex="1">
 </td>
-<td></td>
+<td><input class="btn btn-xs btn-default" type="submit" name="search" value="Cerca" tabindex="1" onClick="javascript:document.report.all.value=1;"></td>
 <td>
-<input type="submit" name="all" value="Mostra tutti" onClick="javascript:document.report.all.value=1;">
+<input class="btn btn-xs btn-default" type="submit" name="all" value="Mostra tutti" onClick="javascript:document.report.all.value=1;">
 </td>
 </tr>
 <?php
