@@ -115,7 +115,8 @@ function HeadMain ($idScript='',$jsArray='',$alternative_transl=false,$cssArray=
         $ctrl_m3=$row['m3_id'];
      }
      ksort($menuArray);
-     /*   Fine creazione array per JSCookMenu.
+     
+	 /*   Fine creazione array per JSCookMenu.
      In $menuArray c'e' la lista del menu
      con index '0' il modulo corrente,
      è una matrice a 3 dimensioni ,

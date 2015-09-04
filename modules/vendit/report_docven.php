@@ -36,6 +36,15 @@ function print_querytime($prev)
     return $this_time;
 }
 
+if ( isset($_GET['ricerca_completa'])) {
+	$ricerca_testo = $_GET['ricerca_completa'];
+	$where .= " and ( ragso1 like '%".$ricerca_testo."%' ";
+	$where .= " or ragso2 like '%".$ricerca_testo."%' ";
+	$where .= " or pariva like '%".$ricerca_testo."%' ";
+	$where .= " or codfis like '%".$ricerca_testo."%' ";
+	$where .= " or descri like '%".$ricerca_testo."%' )";
+}
+
 if (isset($_GET['auxil'])) {
    $seziva = $_GET['auxil'];
    $where = "tipdoc LIKE 'F%' AND ".$gTables['tesdoc'].".seziva = '$seziva' GROUP BY protoc, datfat";
@@ -287,19 +296,36 @@ $recordnav -> output();
 <tr>
 <?php
 // creo l'array (header => campi) per l'ordinamento dei record
-$headers_tesdoc = array  (
-            "Prot." => "protoc",
-            //"Tipo" => "tipdoc",
-            "Numero" => "numfat",
-            "Data" => "datfat",
-            "Cliente" => "ragso1",
-            "Status" => "",
-            "Stampa" => "",
-            "FAE" => "",
-            "Mail" => "",
-            "Origine" => "",
-            "Cancella" => ""
-            );
+if ( isset($articolo) ) {
+	if ( $articolo!="" ) {
+		$headers_tesdoc = array  (
+        "Prot." => "protoc",
+        "Numero" => "numfat",
+        "Data" => "datfat",
+        "Cliente" => "ragso1",
+		"Articoli" => "",
+		"Status" => "",
+        "Stampa" => "",
+        "FAE" => "",
+        "Mail" => "",
+        "Origine" => "",
+        "Cancella" => ""
+        );
+	}
+} else {
+	$headers_tesdoc = array  (
+    "Prot." => "protoc",
+    "Numero" => "numfat",
+    "Data" => "datfat",
+    "Cliente" => "ragso1",
+	"Status" => "",
+    "Stampa" => "",
+    "FAE" => "",
+    "Mail" => "",
+    "Origine" => "",
+    "Cancella" => ""
+    );
+}
 $linkHeaders = new linkHeaders($headers_tesdoc);
 $linkHeaders -> output();
 ?>
@@ -308,7 +334,7 @@ $linkHeaders -> output();
 $rs_ultimo_documento = gaz_dbi_dyn_query("id_tes", $gTables['tesdoc'], "tipdoc LIKE 'F%' AND seziva = '$seziva'","datfat DESC, protoc DESC, id_tes",0,1);
 $ultimo_documento = gaz_dbi_fetch_array($rs_ultimo_documento);
 //recupero le testate in base alle scelte impostate
-$result = gaz_dbi_dyn_query($gTables['rigdoc'].".*, ".$gTables['tesdoc'].".*, MAX(".$gTables['tesdoc'].".id_tes) AS reftes,".$gTables['anagra'].".fe_cod_univoco,".$gTables['anagra'].".ragso1,".$gTables['anagra'].".e_mail,".$gTables['clfoco'].".codice,".$gTables['pagame'].".tippag", $gTables['tesdoc']." LEFT JOIN ".$gTables['clfoco']." ON ".$gTables['tesdoc'].".clfoco = ".$gTables['clfoco'].".codice  LEFT JOIN ".$gTables['anagra']." ON ".$gTables['clfoco'].".id_anagra = ".$gTables['anagra'].".id  LEFT JOIN ".$gTables['pagame']." ON ".$gTables['tesdoc'].".pagame = ".$gTables['pagame'].".codice inner join ".$gTables['rigdoc']." on ".$gTables['rigdoc'].".id_tes = ".$gTables['tesdoc'].".id_tes", $where, $orderby,$limit, $passo);
+$result = gaz_dbi_dyn_query($gTables['rigdoc'].".*, ".$gTables['tesdoc'].".*, MAX(".$gTables['tesdoc'].".id_tes) AS reftes,".$gTables['anagra'].".fe_cod_univoco,".$gTables['anagra'].".ragso1,".$gTables['anagra'].".e_mail,".$gTables['clfoco'].".codice,".$gTables['pagame'].".tippag", $gTables['tesdoc']." LEFT JOIN ".$gTables['clfoco']." ON ".$gTables['tesdoc'].".clfoco = ".$gTables['clfoco'].".codice  LEFT JOIN ".$gTables['anagra']." ON ".$gTables['clfoco'].".id_anagra = ".$gTables['anagra'].".id  LEFT JOIN ".$gTables['pagame']." ON ".$gTables['tesdoc'].".pagame = ".$gTables['pagame'].".codice left join ".$gTables['rigdoc']." on ".$gTables['rigdoc'].".id_tes = ".$gTables['tesdoc'].".id_tes", $where, $orderby,$limit, $passo);
 $ctrl_doc = "";
 $ctrl_eff = 999999;
 while ($r = gaz_dbi_fetch_array($result)) {
@@ -363,6 +389,14 @@ while ($r = gaz_dbi_fetch_array($result)) {
         echo "<td class=\"FacetDataTD\" align=\"center\">".gaz_format_date($r["datfat"])." &nbsp;</td>";
 		// Colonna cliente
         echo "<td class=\"FacetDataTD\"><a title=\"Dettagli cliente\" href=\"report_client.php?auxil=".$r["ragso1"]."&search=Cerca\">".$r["ragso1"]."</a>&nbsp;</td>";
+		// Colonna articolo
+		if ( isset($articolo) ) 
+			if ( $articolo!="" ) {
+				echo "<td class='FacetDataTD'>
+				<a href='admin_artico.php?codice=".$r['codice']."&Update'>";
+				echo $r["codart"]." ";
+				echo $r['descri']."</td>";
+			}
 		// Colonna movimenti contabili
         echo "<td class=\"FacetDataTD\" align=\"center\">";
         if ($r["id_con"] > 0) {
@@ -468,15 +502,6 @@ while ($r = gaz_dbi_fetch_array($result)) {
         $querytime=print_querytime($querytime);
         echo "</td>";*/
         echo "</tr>\n";
-		if ( isset($articolo) ) 
-			if ( $articolo!="" ) {
-		echo "<tr>";
-		echo "<td>&nbsp;</td>";
-		echo "<td colspan='3' class='FacetDataTD'>".$r['codart']." ";
-		echo $r['descri']." ";
-		echo $r['unimis']." ".$r['quanti']."</td>";
-		echo "</tr>";
-		}
     }
     $ctrl_doc = sprintf('%09d',$r['protoc']).$r['datfat'];
 }

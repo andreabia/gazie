@@ -153,8 +153,8 @@ if ( $riga["id"]!="" ) {
 				<div class="form-inline">
 					<form action="<?php echo $posizione; ?>" method="GET">
 						<input type="hidden" name="auxil" value="<?php echo $auxil; ?>">
-						<input disabled type="text" class="form-control input-xs" title="La ricerca viene effettuata nei campi ragione sociale 1 e 2, partita iva, codice fiscale e città" type="text" name="ricerca_completa" placeholder="Cerca nel modulo">
-						<button disabled type="submit" class="btn btn-xs btn-default">Go!</button>
+						<input type="text" class="form-control input-xs" title="La ricerca viene effettuata nei campi ragione sociale 1 e 2, partita iva, codice fiscale e città" type="text" name="ricerca_completa" placeholder="Cerca nel modulo">
+						<button type="submit" class="btn btn-xs btn-default">Go!</button>
 					</form>
 				</div>
 			</div>
